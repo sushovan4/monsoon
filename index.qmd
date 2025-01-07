@@ -7,6 +7,7 @@ logo: logo.png
 subtitle: "JMM, Seattle, January 2025"
 author: "<green><b>Sushovan Majhi</b></green><br><i>George Washington University, Washington D.C.</i>"
 fig-cap-location: bottom
+fig-pos: center
 
 format: 
     revealjs:
@@ -19,6 +20,8 @@ format:
 bibliography: references.bib
 editor: 
   render-on-save: true
+execute: 
+  echo: false
 ---
 
 # Today's Talk {background-image="monsoon.jpg" background-opacity="0.1"}
@@ -90,10 +93,171 @@ The seasonal reversal of the direction of winds along the shores of the Indian O
   - @strommen_topological_2023
 
 
-# Time-delay Embedding
+# Time-delay <green>Embedding</green>
 
+## Lorenz System 
+
+::: {.columns}
+
+::: {.column}
+
+$$
+\begin{aligned}
+\dot{x} &= \sigma(y-x)\\
+\dot{y} &= x(\rho-z)-y\\
+\dot{z} &= xy-\beta z
+\end{aligned}
+$$
+
+:::
+
+
+::: {.column}
+
+```{ojs}
+// fig-caption: true
+Plot.plot({
+  height: 500,
+  widht: 500,
+  x: {
+    domain: [-30, 30],
+    grid: true
+  },
+  y: {
+    domain: [0, 50],
+    grid: true
+  },
+  marks: [
+    Plot.line(lorenzData.slice(0, n), {
+      x: "y",
+      y: "z",
+      strokeWidth: 0.5,
+      stroke: "white"
+    }),
+    Plot.ruleX([0]),
+    Plot.ruleY([0])
+  ]
+});
+mutable play = false;
+viewof playPause = Inputs.button("Play/Pause", {
+  value: false,
+  reduce: () => { mutable play = !play; } 
+});
+```
+
+:::
+
+:::
+
+## Phase-space Reconstruction
+
+```{ojs}
+Plot.plot({
+  height: 200,
+  width: width,
+  marks: [
+    Plot.line(lorenzData.slice(500,3500), {
+      x: "n",
+      y: "z"
+    }),
+    Plot.ruleX([w, w+delay], { stroke: "red" }),
+    Plot.ruleY([0])
+  ]
+});
+```
+
+```{ojs}
+Plot.plot({
+  width: width,
+  marks: [
+    Plot.dot(
+      delayTS(
+        lorenzData.map((d) => d.x),
+        delay
+      ).slice(0, n),
+      {
+        stroke: "red",
+        r: 1
+      }
+    )
+  ]
+});
+```
+
+```{ojs}
+viewof delay = Inputs.number({ value: 100, label: tex`\tau` });
+viewof w = Inputs.range([500, 3500-delay], { value: 500 });
+```
+
+## Embedology
+Takens' Theorem
 
 # Predicting the Onset
 
+## The Monsoon Index
+
+```{ojs}
+Plot.plot({
+  width: width,
+  y: {label: 'Index'},
+  marks: [
+    Plot.line(
+      data,
+      {
+        x: "Date",
+        y: "rain",
+      }
+    )
+  ]
+});
+data = FileAttachment("code/idx_1972.csv").csv({typed: true});
+```
+
+June 18 was the official date.
+
+## The Pipeline
+- Evolving window
+- 
+
+## Inference
+
+# Future Directions
 
 # References
+
+```{ojs}
+delayTS = function (ts, delay = 1, dim = 2) {
+  return ts.map((d, i) => {
+    const out = [];
+    for (let j = 0; j < dim; j++) out.push(ts[i + j * delay]);
+    return out;
+  });
+};
+lorenz = function (
+  [x, y, z] = [0, 0, 0],
+  n = 100,
+  { sigma = 10, r = 28, b = 8 / 3 } = {}
+) {
+  let F = function (t, [x, y, z]) {
+    return [sigma * (y - x), r * x - x * z - y, x * y - b * z];
+  };
+
+  let s = new odex.Solver(3);
+  let flow = [];
+
+  for (let i = 0; i < n; i++) {
+    [x, y, z] = s.solve(F, 0, [x, y, z], 0.01).y;
+    flow.push({ n: i, x: x, y: y, z: z });
+  }
+  return flow;
+};
+lorenzData = lorenz([1, 1, 1], 4000);
+odex = import("https://cdn.skypack.dev/odex@v2.0.4");
+mutable n = 0;
+{
+  let i = 0;
+  while (play && i < 4000) {
+    yield Promises.delay(10, mutable n++);
+  }
+};
+```
