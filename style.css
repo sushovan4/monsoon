@@ -39,7 +39,9 @@ input {
     background-color: inherit!important;
 }
 .btn {
-    background-color: black!important;
+    background-color: transparent!important;
+    border: none;
+    margin-left: 20px!important;
 }
 
 .theorem {

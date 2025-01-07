@@ -26,52 +26,80 @@ execute:
 
 # Today's Talk {background-image="monsoon.jpg" background-opacity="0.1"}
 
-- Climate Science using TDA
-- The Indian Monsoon
-- Topology of Time Series
-  - Taken's Embedding / Sliding Window
-- The Pipeline
-- Predictions
+- Background on the <green>Indian Monsoon</green>
+- <green>Topology</green> of a time series
+- Takens's Embedding Theorem
+- <green>Sliding Window</green>
+- Predicting the <green>onset</green> and <red>withdrawal</red>
 - Future work
 
 # The Indian <green>Monsoon</green> {background-image="monsoon.jpg" background-opacity="0.3"}
 
-## Rain in India
-- Onset May-July
-- Withdrawal Sep-Oct
-  
-![Variation $\pm 20\%$](rain-hist.png)
+## Rain in India {.smaller}
 
-## Geography of India
+:::{.columns}
 
+:::{.column}
+- The climate of India predominately depends on rainfall
+- Average: <green>$899$</green> mm with variation <red>$\pm 20\%$</red>
+- <green>Monsoon</green> is the typical rainy season
+  - <green>Onset</green>: May-July
+  - <red>Withdrawal</red>: Sep-Oct
+- What is the Monsoon?
+:::
 
-![Onset of Monsoon](summer-monsoon.webp)
-
-## 
-
-![Withdrawal of Monsoon](summer-monsoon-w.jpg)
-
-## The Monsoon System
-
-:::{.callout-note}
-## Indian Meteorological Department (IMD)
-The seasonal reversal of the direction of winds along the shores of the Indian Ocean, especially in the Arabian Sea, which blow from the southwest for half of the year and from the northeast for the other half
+:::{.column}
+![Average rainfall across India](rain.png)
+:::
 
 :::
 
-- The biggest financial bet
-- Only partly understood 
-- Notoriously difficult to predict
-- Affecting Indian flora and fauna, Indian economy, and agriculture
-- The most acticipated weather phenomenon
+## The Monsoon System {.smaller}
+:::{.callout-tip appearance="minimal"}
+## <green>Definition</green> according to the *Indian Meteorological Department (IMD)*
+The seasonal <red>reversal</red> of the direction of winds along the shores of the Indian Ocean, especially in the Arabian Sea, which blow from the southwest for half of the year and from the northeast for the other half.
+:::
 
-##
+:::{.columns}
+
+:::{.column}
+
+- Only partly understood 
+- The most anticipated weather phenomenon
+- The biggest financial bet
+- Notoriously difficult to predict
+- Affecting the Indian flora and fauna, economy, and agriculture
+
+:::
+
+:::{.column}
 ![](Indian-Ocean.jpg)
 
+:::
 
-## 
+:::
 
-![](./monsoon-ezgif.com-speed.gif)
+## {background-image="./monsoon-ezgif.com-speed.gif"}
+
+## Monsoon is Coming! {.smaller}
+
+:::{.columns}
+
+:::{.column}
+
+![<green>Onset</green>: May--July](summer-monsoon.webp)
+
+:::
+
+:::{.column}
+
+![<red>Withdrawal</red>: Sep--Oct](summer-monsoon-w.jpg)
+
+:::
+
+- The main objective of the project is develop an early warning system using topological data analysis (TDA).
+:::
+
 
 # <green>Climate Science</green> & <red>TDA</red>  {background-image="drawing.png" background-opacity="0.3"}
 
@@ -93,14 +121,16 @@ The seasonal reversal of the direction of winds along the shores of the Indian O
   - @strommen_topological_2023
 
 
-# Time-delay <green>Embedding</green>
+# <green>Topology</green> of a <green>Time-series</green>
 
-## Lorenz System 
+## Lorenz System {.smaller}
 
 ::: {.columns}
 
-::: {.column}
+::: {.column width="40%"}
 
+:::{.callout-tip}
+## $\sigma = 10$, $\rho = 28$, $\beta = 8 / 3$
 $$
 \begin{aligned}
 \dot{x} &= \sigma(y-x)\\
@@ -108,11 +138,17 @@ $$
 \dot{z} &= xy-\beta z
 \end{aligned}
 $$
+:::
 
+Note that:
+
+- The topological changes are still detectable even when projected onto the two-dimensional plane.
+
+- How much of it can be suggestive by a single signal, e.g. $x$?
 :::
 
 
-::: {.column}
+::: {.column width="60%"}
 
 ```{ojs}
 // fig-caption: true
@@ -131,15 +167,15 @@ Plot.plot({
     Plot.line(lorenzData.slice(0, n), {
       x: "y",
       y: "z",
-      strokeWidth: 0.5,
-      stroke: "white"
+      strokeWidth: 1,
+      stroke: "red"
     }),
     Plot.ruleX([0]),
     Plot.ruleY([0])
   ]
 });
 mutable play = false;
-viewof playPause = Inputs.button("Play/Pause", {
+viewof playPause = Inputs.button(" ⏯️", {
   value: false,
   reduce: () => { mutable play = !play; } 
 });
@@ -257,7 +293,7 @@ mutable n = 0;
 {
   let i = 0;
   while (play && i < 4000) {
-    yield Promises.delay(10, mutable n++);
+    yield Promises.delay(5, mutable n++);
   }
 };
 ```
