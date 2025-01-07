@@ -31,7 +31,7 @@ red {
 }
 
 input {
-    background-color: black!important;
+    background-color: transparent!important;
     border: none!important;
 }
 
@@ -43,7 +43,16 @@ input {
     border: none;
     margin-left: 20px!important;
 }
-
+input[type="range"] {
+   width: 100%!important;
+}
+input[type="number"] {
+    display: none;
+    width: 20%!important;
+} 
+form {
+    width: 100%!important;
+}
 .theorem {
     font-style: italic;
     border: 1px solid #3be57f;

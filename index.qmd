@@ -185,48 +185,136 @@ viewof playPause = Inputs.button(" ⏯️", {
 
 :::
 
-## Phase-space Reconstruction
-
+## Time-Delay Coordinates {.smaller}
+Let's now consider only one signal: $z$
 ```{ojs}
 Plot.plot({
-  height: 200,
+  height: 300,
   width: width,
   marks: [
-    Plot.line(lorenzData.slice(500,3500), {
+    Plot.line(lorenzData.slice(500,600), {
       x: "n",
       y: "z"
     }),
     Plot.ruleX([w, w+delay], { stroke: "red" }),
-    Plot.ruleY([0])
+    Plot.text([[w, 40], [w+delay,40]], {text: [`z_1`, `z_2`]}),
+    Plot.ruleX([500]),   
+    Plot.ruleY([0]),   
   ]
 });
 ```
 
 ```{ojs}
+viewof w = Inputs.range([500, 600-delay-1], { value: 510, step: 1 });
+```
+
+. . . 
+
+The topology of the time-series is shown below:
+```{ojs}
 Plot.plot({
   width: width,
+  height: 600,
+  x: {label: 'z1'},
+  y: {label: 'z2'},
   marks: [
+    Plot.ruleX([22.5]),
+    Plot.ruleY([22]),
+    Plot.dot(
+      delayTS(
+        lorenzData.slice(500,600).map((d) => d.z),
+        delay
+      ),
+      {
+        stroke: "white",
+        r: (d, id) => id == w-500 ? 20 : 6,
+        fill: (d, id) => id == w-500 ? "red" : "none"
+      }
+    )
+  ]
+});
+viewof delay = Inputs.range([1, 50], { value: 1, label: tex`Delay`, step: 1 });
+```
+
+
+## Telling Apart Chaos {.smaller}
+We still consider only one signal: $x$
+```{ojs}
+Plot.plot({
+  height: 300,
+  width: width,
+  marks: [
+    Plot.ruleX([500]),
+    Plot.ruleY([0]),
+    Plot.line(lorenzData.slice(500), {
+      x: "n",
+      y: "x",
+      stroke: (d) => d.n <= 1300 ? "green" : "red"
+    })
+  ]
+});
+```
+
+. . . 
+
+Below are the time-delay embeddings:
+
+:::{.columns}
+
+:::{.column}
+```{ojs}
+Plot.plot({
+  width: width,
+  height: 1500,
+  marks: [
+    Plot.ruleX([-14]),
+    Plot.ruleY([-14]),
     Plot.dot(
       delayTS(
         lorenzData.map((d) => d.x),
-        delay
-      ).slice(0, n),
+        delay1
+      ).slice(500, 1300),
       {
-        stroke: "red",
-        r: 1
+        stroke: "green",
+        r: 3
       }
     )
   ]
 });
 ```
+:::
+
+:::{.column}
+```{ojs}
+Plot.plot({
+  width: width,
+  height: 1500,
+  marks: [
+    Plot.ruleX([-18]),
+    Plot.ruleY([-18]),
+    Plot.dot(
+      delayTS(
+        lorenzData.map((d) => d.x),
+        delay1
+      ).slice(1300),
+      {
+        stroke: "red",
+        r: 3
+      }
+    )
+  ]
+});
+```
+:::
+
+:::
 
 ```{ojs}
-viewof delay = Inputs.number({ value: 100, label: tex`\tau` });
-viewof w = Inputs.range([500, 3500-delay], { value: 500 });
+viewof delay1 = Inputs.range([1, 50], { value: 1, label: tex`Delay`, step: 1 });
 ```
 
-## Embedology
-Takens' Theorem
+## Capturing Transition using Persistence {.smaller}
+- Sliding window
 
 # Predicting the Onset
 
@@ -296,4 +384,5 @@ mutable n = 0;
     yield Promises.delay(5, mutable n++);
   }
 };
+
 ```
