@@ -314,16 +314,31 @@ viewof delay1 = Inputs.range([1, 50], { value: 1, label: tex`Delay`, step: 1 });
 ```
 
 ## Capturing Transition using Persistence {.smaller}
-- Sliding window
+Use overlapping windows by Sliding window
 
-# Predicting the Onset
+1. take the input signal
 
-## The Monsoon Index
+2. set a window size and delay
+
+3. position the window at the beginning of the time-series, and do the following:
+    - construct a point-cloud using time-delay embedding
+
+    - compute persistence diagram
+
+    - additionally, compute  summaries like persistence landscapes, $L^p$ norms
+
+4. slide the window one-step forward, and repeat 3 until the end of the time-series is reached. 
+
+5. In our case, we accumulate the computed norms to output a time-series.
+
+# Predicting the <green>Monsoon</green>
+
+## The Monsoon Index 
 
 ```{ojs}
 Plot.plot({
   width: width,
-  y: {label: 'Index'},
+  height: 500,
   marks: [
     Plot.line(
       data,
@@ -337,13 +352,38 @@ Plot.plot({
 data = FileAttachment("code/idx_1972.csv").csv({typed: true});
 ```
 
-June 18 was the official date.
+. . . 
 
-## The Pipeline
-- Evolving window
-- 
+Q: Can you guess the official onset?
 
-## Inference
+. . . 
+
+
+A: June 18 was the official date.
+
+## Inference using Sliding Window {.smaller}
+
+Sliding Window:
+
+1. Window size $30$
+
+2. Delay $7$
+
+```{ojs}
+Plot.plot({
+  width: width,
+  height: 600,
+  marks: [
+    Plot.line(
+      data,
+      {
+        x: "Date",
+        y: "rain",
+      }
+    )
+  ]
+});
+```
 
 # Future Directions
 
