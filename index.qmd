@@ -140,6 +140,8 @@ $$
 $$
 :::
 
+- What is Chaos? 
+  
 Note that:
 
 - The topological changes are still detectable even when projected onto the two-dimensional plane.
@@ -151,27 +153,21 @@ Note that:
 ::: {.column width="60%"}
 
 ```{ojs}
-// fig-caption: true
 Plot.plot({
-  height: 500,
-  widht: 500,
-  x: {
-    domain: [-30, 30],
-    grid: true
-  },
-  y: {
-    domain: [0, 50],
-    grid: true
-  },
+  grid: true,
+  height: 1000,
+  width: width,
+  x: { domain: [-20, 20] },
+  y: { domain: [-23, 30] },
   marks: [
     Plot.line(lorenzData.slice(0, n), {
-      x: "y",
-      y: "z",
-      strokeWidth: 1,
+      x: "x",
+      y: "y",
+      strokeWidth: 2,
       stroke: "red"
     }),
-    Plot.ruleX([0]),
-    Plot.ruleY([0])
+    Plot.ruleX([-20]),
+    Plot.ruleY([-23])
   ]
 });
 mutable play = false;
@@ -186,20 +182,21 @@ viewof playPause = Inputs.button(" ⏯️", {
 :::
 
 ## Time-Delay Coordinates {.smaller}
-Let's now consider only one signal: $z$
+Let's now consider only one signal: $x$!
 ```{ojs}
 Plot.plot({
-  height: 300,
+  height: 200,
   width: width,
+  x: {label: "t →"},
   marks: [
     Plot.line(lorenzData.slice(500,600), {
       x: "n",
-      y: "z"
+      y: "x"
     }),
     Plot.ruleX([w, w+delay], { stroke: "red" }),
-    Plot.text([[w, 40], [w+delay,40]], {text: [`z_1`, `z_2`]}),
+    Plot.text([[w, -5], [w+delay+0.6, -5]], {text: [`d1`, `d2`]}),
     Plot.ruleX([500]),   
-    Plot.ruleY([0]),   
+    Plot.ruleY([-12]),   
   ]
 });
 ```
@@ -214,9 +211,9 @@ The topology of the time-series is shown below:
 ```{ojs}
 Plot.plot({
   width: width,
-  height: 600,
-  x: {label: 'z1'},
-  y: {label: 'z2'},
+  height: 400,
+  x: {label: 'd1'},
+  y: {label: 'd2'},
   marks: [
     Plot.ruleX([22.5]),
     Plot.ruleY([22]),
@@ -233,7 +230,7 @@ Plot.plot({
     )
   ]
 });
-viewof delay = Inputs.range([1, 50], { value: 1, label: tex`Delay`, step: 1 });
+viewof delay = Inputs.range([1, 50], { value: 1, label: `Delay`, step: 1 });
 ```
 
 
@@ -470,7 +467,7 @@ mutable n = 0;
 {
   let i = 0;
   while (play && i < 4000) {
-    yield Promises.delay(5, mutable n++);
+    yield Promises.delay(3, mutable n++);
   }
 };
 function dualAxisY(data, {y, ticks = 10, tickFormat, ...options} = {}) {
