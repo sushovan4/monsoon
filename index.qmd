@@ -350,6 +350,7 @@ Plot.plot({
   ]
 });
 data = FileAttachment("code/idx_1972.csv").csv({typed: true});
+norms = FileAttachment("code/idx_1972_norms.csv").csv({typed: true});
 ```
 
 . . . 
@@ -363,27 +364,75 @@ A: June 18 was the official date.
 
 ## Inference using Sliding Window {.smaller}
 
-Sliding Window:
-
-1. Window size $30$
-
-2. Delay $7$
+Sliding Window: Window size $30$, Delay $7$
 
 ```{ojs}
 Plot.plot({
   width: width,
-  height: 600,
+  height: 200,
   marks: [
-    Plot.line(
+    Plot.dot(
       data,
       {
         x: "Date",
         y: "rain",
+        stroke: (d, index) => index >= w1 && index <= w1 + w_size ? "red" : "white"
       }
     )
   ]
 });
+
 ```
+
+```{ojs}
+w_size = 30
+viewof w1 = Inputs.range([0, data.length-w_size-1], { value: 0, step: 1 });
+```
+
+```{ojs}
+Plot.plot({
+  width: width,
+  height: 400,
+  x: {label: 'z1'},
+  y: {label: 'z2'},
+  marks: [
+    Plot.dot(
+      delayTS(
+        data.map((d) => d.rain),
+        delay3
+      ).slice(w1, w1 + w_size),
+      {
+        stroke: "red",
+        r: 4,
+      }
+    )
+  ]
+});
+viewof delay3 = Inputs.range([1, 20], { value: 1, label: tex`Delay`, step: 1 });
+```
+
+## Onset and Withdrawal {.smaller}
+
+```{ojs}
+Plot.plot({
+  width: width,
+  height: 500,
+  marks: [
+    dualAxisY(data, {y: "rain", anchor: "left", color: "white"}),
+    dualAxisY(norms, {y: "norm", anchor: "right", color: "red"}),
+    Plot.lineY(
+      data,
+      Plot.normalizeY("extent", {x: "Date", y: "rain", stroke: "white"})
+    ),
+    Plot.lineY(
+      norms,
+      Plot.normalizeY("extent", {x: "Date", y: "norm", stroke: "red"})
+    )
+  ]
+});
+
+```
+
 
 # Future Directions
 
@@ -424,5 +473,9 @@ mutable n = 0;
     yield Promises.delay(5, mutable n++);
   }
 };
-
+function dualAxisY(data, {y, ticks = 10, tickFormat, ...options} = {}) {
+  const [y1, y2] = d3.extent(Plot.valueof(data, y));
+  const scale = d3.scaleLinear().domain([y1, y2]);
+  return Plot.axisY(d3.ticks(y1, y2, ticks), {...options, y: scale, tickFormat: scale.tickFormat(ticks, tickFormat)});
+}
 ```
